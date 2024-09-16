@@ -11,9 +11,5 @@ package Proyecto;
 public class Turnos {
     
     public Turnos(){
-        
-    }
-    
-    
-    
+    } 
 }
