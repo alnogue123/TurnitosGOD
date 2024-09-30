@@ -39,7 +39,6 @@ public class EstilosDeLaTabla extends DefaultTableCellRenderer {
     }
 
     @Override
-    //Renderizar la tabla
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         if (HeaderActivado) {
@@ -47,17 +46,21 @@ public class EstilosDeLaTabla extends DefaultTableCellRenderer {
             setBackground(new Color(104, 62, 130));
             setForeground(Color.WHITE);
             setFont(new Font("Arial", Font.BOLD, 18));
-            setBorder(BorderFactory.createMatteBorder(15, 0, 15, 1, Color.WHITE));
         } else if (CuerpoTablaActivado) {
             setText(value != null ? value.toString() : "");
+
             if (row % 2 == 0) {
                 setBackground(new Color(127, 86, 132));
             } else {
                 setBackground(new Color(127, 106, 132));
             }
             setForeground(Color.WHITE);
-            setFont(new Font("Arial", Font.BOLD, 18));
+            setFont(new Font("Arial", Font.PLAIN, 16));
         }
-        return this;
+        if (isSelected) {
+            setBackground(new Color(85, 107, 47));
+            setForeground(Color.YELLOW);
+        }
+        return c;
     }
 }
