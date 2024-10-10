@@ -4,6 +4,8 @@
  */
 package Proyecto.FormularioRegistro;
 
+import Reportes.Frm_Reportes;
+import InicioSesion.Frm_InicioSesion;
 import Proyecto.Frm_Turnos;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
@@ -21,8 +23,10 @@ public class Frm_Registros extends javax.swing.JFrame {
     private final String[] Motivos = {"Retiros", "Prestamos", "Consignaciones"};
     private String TipoDocumento;
     private double numeroDocumento;
-    private final Frm_Turnos Turnitos;
-    public ArrayList<Cliente> ListaDocumentos;
+    private Frm_Turnos Turnitos = null;
+    private static Frm_Registros instance;
+
+    private ArrayList<Cliente> ListaDocumentos;
     private final ArrayList<MotivoVisita> Listamotivos;
     public String turno, modulo;
     private int contadorR = 0;
@@ -35,13 +39,28 @@ public class Frm_Registros extends javax.swing.JFrame {
         initComponents();
         ListaDocumentos = new ArrayList<>();
         Listamotivos = new ArrayList<>();
-        Turnitos = new Frm_Turnos(this);
+        Turnitos = Turnitos.getInstance();
         setLocationRelativeTo(null);
         CrearTabla();
         Turnitos.PersonalizarTabla(TablModificable);
         CrearComboBox();
     }
-
+    
+    public static Frm_Registros getInstance (){
+        if (instance == null) {
+            instance = new Frm_Registros();
+        }
+        return instance;
+    }
+    
+    public void Sesion (String sesion) {
+        this.setTitle("Registro del empleado " + "("+ "Sesion de " + sesion + ")");
+        MenuItem_Reportes.setEnabled(true);
+        if (sesion.equals("Empleado")){
+            MenuItem_Reportes.setEnabled(false);
+        }
+    }
+        
     public ArrayList<Cliente> getListaDocumentos() {
         return this.ListaDocumentos;
     }
@@ -137,8 +156,12 @@ public class Frm_Registros extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         TablModificable = new javax.swing.JTable();
         CB_TipoIdentificacion = new javax.swing.JComboBox<>();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        MenuItem_Reportes = new javax.swing.JMenuItem();
+        MenuItem_CerrarSesion = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Registro del empleado");
         setResizable(false);
 
@@ -174,6 +197,7 @@ public class Frm_Registros extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        TablModificable.setEnabled(false);
         jScrollPane1.setViewportView(TablModificable);
 
         CB_TipoIdentificacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -186,7 +210,7 @@ public class Frm_Registros extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(Txt_NumeroIdentificacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(CB_motivo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -219,6 +243,28 @@ public class Frm_Registros extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jMenu1.setText("Opciones");
+
+        MenuItem_Reportes.setText("Reportes");
+        MenuItem_Reportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItem_ReportesActionPerformed(evt);
+            }
+        });
+        jMenu1.add(MenuItem_Reportes);
+
+        MenuItem_CerrarSesion.setText("Cerrar Sesion");
+        MenuItem_CerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItem_CerrarSesionActionPerformed(evt);
+            }
+        });
+        jMenu1.add(MenuItem_CerrarSesion);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -227,7 +273,10 @@ public class Frm_Registros extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -254,6 +303,22 @@ public class Frm_Registros extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Seleccione su tipo de documento", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_Btn_registrarActionPerformed
+
+    private void MenuItem_CerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_CerrarSesionActionPerformed
+        // TODO add your handling code here:
+        int eleccion = JOptionPane.showConfirmDialog(rootPane, "¿Estas seguro de que deseas cerrar esta sesion?", "Alerta", JOptionPane.WARNING_MESSAGE, JOptionPane.WARNING_MESSAGE);
+        if (eleccion == 0) {
+            Frm_InicioSesion iniciosesion = new Frm_InicioSesion();
+            iniciosesion.setVisible(true);
+            this.dispose();
+        }
+    }//GEN-LAST:event_MenuItem_CerrarSesionActionPerformed
+
+    private void MenuItem_ReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_ReportesActionPerformed
+        // TODO add your handling code here:
+        Frm_Reportes reportes = new Frm_Reportes();
+        reportes.setVisible(true);
+    }//GEN-LAST:event_MenuItem_ReportesActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -299,11 +364,15 @@ public class Frm_Registros extends javax.swing.JFrame {
     private javax.swing.JButton Btn_registrar;
     private javax.swing.JComboBox<String> CB_TipoIdentificacion;
     private javax.swing.JComboBox<String> CB_motivo;
+    private javax.swing.JMenuItem MenuItem_CerrarSesion;
+    private javax.swing.JMenuItem MenuItem_Reportes;
     private javax.swing.JTable TablModificable;
     private java.awt.TextField Txt_NumeroIdentificacion;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

@@ -8,6 +8,13 @@ import Proyecto.folder.EstilosDeLaTabla;
 import javax.swing.JTable;
 import javax.swing.table.*;
 import Proyecto.FormularioRegistro.Frm_Registros;
+import InicioSesion.Frm_InicioSesion;
+import Proyecto.FormularioRegistro.Cliente;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import javax.swing.JOptionPane;
 
 /*
  *
@@ -15,18 +22,34 @@ import Proyecto.FormularioRegistro.Frm_Registros;
  */
 public class Frm_Turnos extends javax.swing.JFrame {
 
+    private static Frm_Turnos instance;
     private final String[] encabezados = {"Turno", "Modulo"};
     EstilosDeLaTabla EstiloHeader = new EstilosDeLaTabla();
     EstilosDeLaTabla EstiloTabla = new EstilosDeLaTabla();
-    Frm_Registros Registros;
-    int contador;
+    static Frm_Registros Registros;
+    Frm_InicioSesion InicioSesion;
+    public int contador;
 
-    public Frm_Turnos(Frm_Registros registros) {
+    public Frm_Turnos() {
         initComponents();
-        this.Registros = registros;
+        this.Registros = InicioSesion.getRegistros();
         PersonalizarTabla(TablaTurnos);
         setLocationRelativeTo(null);
+        if (InicioSesion == null || !InicioSesion.isVisible()) {
+            InicioSesion = InicioSesion.getInstance();
+            InicioSesion.setVisible(true);
+        }
+    }
 
+    public static Frm_Turnos getInstance() {
+        if (instance == null) {
+            instance = new Frm_Turnos();
+        }
+        return instance;
+    }
+
+    public static Frm_Registros getRegistros() {
+        return Registros;
     }
 
     public JTable getTablaTurnos() {
@@ -61,8 +84,8 @@ public class Frm_Turnos extends javax.swing.JFrame {
         if (Registros.getListaDocumentos() != null && !Registros.getListaDocumentos().isEmpty()) {
             for (int i = 0; i < Registros.getListaDocumentos().size(); i++) {
                 modelo.addRow(new Object[]{
-                    Registros.ListaDocumentos.get(i).getTurno(),
-                    Registros.ListaDocumentos.get(i).getModulo()
+                    Registros.getListaDocumentos().get(i).getTurno(),
+                    Registros.getListaDocumentos().get(i).getModulo()
                 });
             }
         } else {
@@ -92,7 +115,7 @@ public class Frm_Turnos extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         BTn_CambiarTurno = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(245, 245, 245));
         setResizable(false);
 
@@ -140,6 +163,7 @@ public class Frm_Turnos extends javax.swing.JFrame {
             }
         });
         TablaTurnos.setColumnSelectionAllowed(true);
+        TablaTurnos.setEnabled(false);
         TablaTurnos.setShowGrid(true);
         jScrollPane1.setViewportView(TablaTurnos);
         TablaTurnos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -284,11 +308,25 @@ public class Frm_Turnos extends javax.swing.JFrame {
 
     private void BTn_CambiarTurnoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BTn_CambiarTurnoActionPerformed
         Registros.SeleccionarFilaTabla(TablaTurnos);
-        int filaSeleccionada = TablaTurnos.getSelectedRow(); 
-        int columnaTurno = 0; 
-        int columnaModulo = 1;  
+        int filaSeleccionada = TablaTurnos.getSelectedRow();
+        int columnaTurno = 0;
+        int columnaModulo = 1;
+        /*No se*/
+        int respuesta = JOptionPane.showConfirmDialog(rootPane, "¿El ciente fue atendido?", "Alerta", JOptionPane.WARNING_MESSAGE);
 
-        if (filaSeleccionada != -1) { 
+        for (int i = 0; i < Registros.getListaDocumentos().size(); i++) {
+            if (i == TablaTurnos.getSelectedRow()) {
+                if (respuesta == 0) {
+                    Date fechaTurno = new Date();
+                    Registros.getListaDocumentos().get(i).setFechaTurno(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(fechaTurno));
+                    System.out.println("Fecha: "+ Registros.getListaDocumentos().get(i).getFechaTurno());
+                    Registros.getListaDocumentos().get(i).setAtendido("Si");
+                }
+            }
+        }
+//        System.out.println("Indice: " + TablaTurnos.getSelectedRow());
+
+        if (filaSeleccionada != -1) {
             String turnoSeleccionado = TablaTurnos.getValueAt(filaSeleccionada, columnaTurno).toString();
             String moduloSeleccionado = TablaTurnos.getValueAt(filaSeleccionada, columnaModulo).toString();
             LB_TurnoSeleccionado.setText(turnoSeleccionado + " " + moduloSeleccionado);
@@ -328,10 +366,8 @@ public class Frm_Turnos extends javax.swing.JFrame {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Frm_Registros registros = new Frm_Registros();
-                Frm_Turnos turnos = new Frm_Turnos(registros);
+                Frm_Turnos turnos = new Frm_Turnos();
                 turnos.setVisible(true);
-                registros.setVisible(true);
             }
         });
     }
