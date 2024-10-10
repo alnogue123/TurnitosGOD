@@ -3,22 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Proyecto.FormularioRegistro;
-
-import java.util.ArrayList;
-import java.util.Date;
-
 /**
  *
  * @author alnog
  */
 public class Cliente {
-    private String TipoIdendificacion;
-    private double NumeroIdentificacion;
-    private String Turno,modulo;
+    private final String TipoIdendificacion;
+    private final double NumeroIdentificacion;
+    private final String Turno;
+    private final String modulo;
     
     private String fechaTurno = null;
     
-    private String Atendido = "No";
+    private String Atendido = null;
     
 
     public Cliente(String TipoIdendificacion, double NumeroIdentificacion, String Turno, String modulo) {

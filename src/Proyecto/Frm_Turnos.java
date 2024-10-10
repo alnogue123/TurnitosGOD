@@ -321,11 +321,11 @@ public class Frm_Turnos extends javax.swing.JFrame {
                     Registros.getListaDocumentos().get(i).setFechaTurno(new SimpleDateFormat("dd/MM/yyy HH:mm:ss").format(fechaTurno));
                     System.out.println("Fecha: "+ Registros.getListaDocumentos().get(i).getFechaTurno());
                     Registros.getListaDocumentos().get(i).setAtendido("Si");
+                }else{
+                    Registros.getListaDocumentos().get(i).setAtendido("no");
                 }
             }
         }
-//        System.out.println("Indice: " + TablaTurnos.getSelectedRow());
-
         if (filaSeleccionada != -1) {
             String turnoSeleccionado = TablaTurnos.getValueAt(filaSeleccionada, columnaTurno).toString();
             String moduloSeleccionado = TablaTurnos.getValueAt(filaSeleccionada, columnaModulo).toString();

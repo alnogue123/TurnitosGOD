@@ -17,11 +17,11 @@ public class Frm_InicioSesion extends javax.swing.JFrame {
      * Creates new form Frm_InicioSesion
      */
     private static Frm_InicioSesion instance;
-    private String UsuarioEmpleado = "DiegoMejia";
-    private String ContraseñaEmpleado = "123";
+    private final String UsuarioEmpleado = "DiegoMejia";
+    private final String ContraseñaEmpleado = "123";
     
-    private String UsuarioAdministrador = "Mejia";
-    private String ContraseñaAdministrador = "321";
+    private final String UsuarioAdministrador = "Mejia";
+    private final String ContraseñaAdministrador = "321";
     public String Sesion = "";
     public static Frm_Registros registros = new Frm_Registros();
     

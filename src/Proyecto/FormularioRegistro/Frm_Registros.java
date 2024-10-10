@@ -7,6 +7,7 @@ package Proyecto.FormularioRegistro;
 import Reportes.Frm_Reportes;
 import InicioSesion.Frm_InicioSesion;
 import Proyecto.Frm_Turnos;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -34,7 +35,7 @@ public class Frm_Registros extends javax.swing.JFrame {
     private int contadorC = 0;
     private int fila = 0;
     private int fila2 = 0;
-    
+
     public Frm_Registros() {
         initComponents();
         ListaDocumentos = new ArrayList<>();
@@ -45,36 +46,36 @@ public class Frm_Registros extends javax.swing.JFrame {
         Turnitos.PersonalizarTabla(TablModificable);
         CrearComboBox();
     }
-    
-    public static Frm_Registros getInstance (){
+
+    public static Frm_Registros getInstance() {
         if (instance == null) {
             instance = new Frm_Registros();
         }
         return instance;
     }
-    
-    public void Sesion (String sesion) {
-        this.setTitle("Registro del empleado " + "("+ "Sesion de " + sesion + ")");
+
+    public void Sesion(String sesion) {
+        this.setTitle("Registro del empleado " + "(" + "Sesion de " + sesion + ")");
         MenuItem_Reportes.setEnabled(true);
-        if (sesion.equals("Empleado")){
+        if (sesion.equals("Empleado")) {
             MenuItem_Reportes.setEnabled(false);
         }
     }
-        
+
     public ArrayList<Cliente> getListaDocumentos() {
         return this.ListaDocumentos;
     }
 
     private void CrearTabla() {
         DefaultTableModel modelo = new DefaultTableModel();
+        DecimalFormat df = new DecimalFormat("#");
         modelo.setColumnIdentifiers(Encabezado);
         for (int i = 0; i < ListaDocumentos.size(); i++) {
             modelo.addRow(new Object[]{
                 ListaDocumentos.get(i).getTipoIdendificacion(),
-                ListaDocumentos.get(i).getNumeroIdentificacion(),
+                df.format(ListaDocumentos.get(i).getNumeroIdentificacion()).replace(".0", ""),
                 ListaDocumentos.get(i).getTurno()
-            }
-            );
+            });
         }
         TablModificable.setModel(modelo);
     }
@@ -127,9 +128,7 @@ public class Frm_Registros extends javax.swing.JFrame {
         return TablModificable;
     }
 
-    
-    
-     public void SeleccionarFilaTabla(JTable Tabla ) {
+    public void SeleccionarFilaTabla(JTable Tabla) {
         if (fila < Tabla.getRowCount() && fila >= 0) {
             int filaSeleccionada = fila;
             fila++;
@@ -141,7 +140,7 @@ public class Frm_Registros extends javax.swing.JFrame {
             fila = 0;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -161,9 +160,14 @@ public class Frm_Registros extends javax.swing.JFrame {
         MenuItem_Reportes = new javax.swing.JMenuItem();
         MenuItem_CerrarSesion = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Registro del empleado");
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -289,8 +293,7 @@ public class Frm_Registros extends javax.swing.JFrame {
                     llenarVariables();
                     numeroDocumento = Double.parseDouble(Txt_NumeroIdentificacion.getText());
                     String[] encabezados = {"Turno", "Modulo"};
-                    ListaDocumentos.add(new Cliente(TipoDocumento, numeroDocumento, turno, modulo));
-                    Listamotivos.add(new MotivoVisita(CB_motivo.getSelectedItem().toString()));
+                    ValidadCliente();
                     Turnitos.ConstruirTabla(Turnitos.getTablaTurnos(), encabezados);
                     CrearTabla();
                 } catch (NumberFormatException e) {
@@ -304,8 +307,25 @@ public class Frm_Registros extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_Btn_registrarActionPerformed
 
+    private void ValidadCliente() {
+        boolean Encontrado = false;
+        for (Cliente client : ListaDocumentos) {
+            if (client.getNumeroIdentificacion() == Integer.parseInt(Txt_NumeroIdentificacion.getText())) {
+                Encontrado = true;
+                break;
+            }
+        }
+
+        if (!Encontrado) {
+            ListaDocumentos.add(new Cliente(TipoDocumento, numeroDocumento, turno, modulo));
+            Listamotivos.add(new MotivoVisita(CB_motivo.getSelectedItem().toString()));
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "El cliente ya fue registrado anteriormente");
+        }
+    }
+
     private void MenuItem_CerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItem_CerrarSesionActionPerformed
-        // TODO add your handling code here:
+
         int eleccion = JOptionPane.showConfirmDialog(rootPane, "¿Estas seguro de que deseas cerrar esta sesion?", "Alerta", JOptionPane.WARNING_MESSAGE, JOptionPane.WARNING_MESSAGE);
         if (eleccion == 0) {
             Frm_InicioSesion iniciosesion = new Frm_InicioSesion();
@@ -320,8 +340,18 @@ public class Frm_Registros extends javax.swing.JFrame {
         reportes.setVisible(true);
     }//GEN-LAST:event_MenuItem_ReportesActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        int eleccion = JOptionPane.showConfirmDialog(rootPane, "¿Estas seguro de que deseas cerrar esta sesion?", "Alerta", JOptionPane.WARNING_MESSAGE, JOptionPane.WARNING_MESSAGE);
+        if (eleccion == 0) {
+            Frm_InicioSesion iniciosesion = new Frm_InicioSesion();
+            iniciosesion.setVisible(true);
+            this.dispose();
+        }else{
+            
+        }
+    }//GEN-LAST:event_formWindowClosing
+
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -351,8 +381,6 @@ public class Frm_Registros extends javax.swing.JFrame {
                     .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Frm_Registros().setVisible(true);
